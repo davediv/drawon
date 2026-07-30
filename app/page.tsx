@@ -20,6 +20,7 @@ import {
   Undo2,
   X,
 } from "lucide-react";
+import { isPenPose, type LandmarkPoint } from "./hand-gesture";
 
 const MEDIAPIPE_VERSION = "1.0.0";
 const WASM_PATH = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
@@ -63,7 +64,6 @@ type TrackerStatus = "loading" | "ready" | "error";
 type CameraStatus = "off" | "starting" | "on" | "error";
 type Tool = "pen" | "eraser";
 type Point = { x: number; y: number };
-type LandmarkPoint = { x: number; y: number; z?: number };
 type Stroke = {
   id: number;
   points: Point[];
@@ -74,74 +74,6 @@ type Stroke = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
-}
-
-function distance3D(a: LandmarkPoint, b: LandmarkPoint) {
-  return Math.hypot(a.x - b.x, a.y - b.y, (a.z ?? 0) - (b.z ?? 0));
-}
-
-function jointAngle(a: LandmarkPoint, b: LandmarkPoint, c: LandmarkPoint) {
-  const ab = {
-    x: a.x - b.x,
-    y: a.y - b.y,
-    z: (a.z ?? 0) - (b.z ?? 0),
-  };
-  const cb = {
-    x: c.x - b.x,
-    y: c.y - b.y,
-    z: (c.z ?? 0) - (b.z ?? 0),
-  };
-  const denominator =
-    Math.hypot(ab.x, ab.y, ab.z) * Math.hypot(cb.x, cb.y, cb.z);
-
-  if (!denominator) return 0;
-  const cosine = clamp(
-    (ab.x * cb.x + ab.y * cb.y + ab.z * cb.z) / denominator,
-    -1,
-    1,
-  );
-  return (Math.acos(cosine) * 180) / Math.PI;
-}
-
-function fingerIsExtended(
-  landmarks: LandmarkPoint[],
-  mcp: number,
-  pip: number,
-  dip: number,
-  tip: number,
-) {
-  return (
-    jointAngle(landmarks[mcp], landmarks[pip], landmarks[dip]) > 150 &&
-    jointAngle(landmarks[pip], landmarks[dip], landmarks[tip]) > 150 &&
-    distance3D(landmarks[tip], landmarks[0]) >
-      distance3D(landmarks[pip], landmarks[0]) * 1.12
-  );
-}
-
-function fingerIsCurled(
-  landmarks: LandmarkPoint[],
-  mcp: number,
-  pip: number,
-  dip: number,
-  tip: number,
-) {
-  return (
-    jointAngle(landmarks[mcp], landmarks[pip], landmarks[dip]) < 145 ||
-    jointAngle(landmarks[pip], landmarks[dip], landmarks[tip]) < 145 ||
-    distance3D(landmarks[tip], landmarks[0]) <
-      distance3D(landmarks[pip], landmarks[0]) * 1.05
-  );
-}
-
-function isPenPose(landmarks: LandmarkPoint[]) {
-  if (landmarks.length !== 21) return false;
-
-  return (
-    fingerIsExtended(landmarks, 5, 6, 7, 8) &&
-    fingerIsCurled(landmarks, 9, 10, 11, 12) &&
-    fingerIsCurled(landmarks, 13, 14, 15, 16) &&
-    fingerIsCurled(landmarks, 17, 18, 19, 20)
-  );
 }
 
 function mapLandmarkToStage(
@@ -726,7 +658,11 @@ export default function Home() {
         ),
       );
       const penPoseByHand = landmarks.map((hand, index) =>
-        isPenPose(worldLandmarks[index] ?? hand),
+        isPenPose(worldLandmarks[index] ?? hand, {
+          holding:
+            gestureActiveRef.current &&
+            activeHandIndexRef.current === index,
+        }),
       );
       const penCandidates = penPoseByHand
         .map((isPen, index) => {
@@ -1354,7 +1290,7 @@ export default function Home() {
                           ? "Drawing"
                           : "Pen ready"
                       : handsCount
-                        ? "Curl your other fingers to draw"
+                        ? "Pinch thumb + index, or point to draw"
                         : "Show your hand"}
                   </span>
                 </div>
@@ -1371,8 +1307,8 @@ export default function Home() {
                 <p className="eyebrow">INVISIBLE WHITEBOARD</p>
                 <h1>Your hand is the pen.</h1>
                 <p className="welcome-copy">
-                  Point with your index finger, curl the others, and draw
-                  directly into the air.
+                  Pinch thumb and index like holding a pen—or point with your
+                  index—then draw directly into the air.
                 </p>
 
                 {cameraError && (
@@ -1420,10 +1356,10 @@ export default function Home() {
           <div className="studio-footer">
             <div className="pose-guide">
               <span className="pose-number">01</span>
-              <span>Index finger up</span>
+              <span>Choose your grip</span>
               <i />
               <span className="pose-number">02</span>
-              <span>Other fingers curled</span>
+              <span>Pinch or point</span>
               <i />
               <span className="pose-number">03</span>
               <span>Move to draw</span>

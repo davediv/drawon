@@ -7,7 +7,8 @@ not uploaded.
 ## Features
 
 - Live, mirrored webcam feed with two-hand landmark tracking
-- Pen-pose detection: extend the index finger and curl the other fingers
+- Pen-pose detection: pinch thumb and index, or extend the index finger, while
+  keeping the other fingers curled
 - Adaptive pointer smoothing and interpolated strokes
 - Color, brush size, eraser, clear, undo, and redo controls
 - Optional local background image

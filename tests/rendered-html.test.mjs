@@ -39,8 +39,9 @@ test("server-renders the Drawon application shell", async () => {
 });
 
 test("includes webcam tracking and complete drawing controls", async () => {
-  const [page, layout, packageJson] = await Promise.all([
+  const [page, gesture, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/hand-gesture.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
@@ -49,7 +50,9 @@ test("includes webcam tracking and complete drawing controls", async () => {
   assert.match(page, /navigator\.mediaDevices\.getUserMedia/);
   assert.match(page, /detectForVideo/);
   assert.match(page, /numHands:\s*2/);
-  assert.match(page, /fingerIsExtended/);
+  assert.match(page, /holding:/);
+  assert.match(gesture, /PINCH_ENGAGE_RATIO/);
+  assert.match(gesture, /fingerIsExtended/);
   assert.match(page, /destination-out/);
   assert.match(page, /redoStackRef/);
   assert.match(page, /toBlob/);
