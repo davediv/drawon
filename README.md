@@ -2,7 +2,8 @@
 
 Drawon turns a webcam and an index finger into a real-time air canvas. Hand
 landmarks are processed locally in the browser with MediaPipe; webcam frames are
-not uploaded.
+not uploaded. This repository is configured for local use only and has no
+ChatGPT Sites hosting configuration.
 
 ## Features
 
