@@ -2,3 +2,11 @@ dist
 node_modules
 .tmp
 .DS_Store
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+drawone-*.png

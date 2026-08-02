@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drawone"
+version = "1.0.0"
+description = "Virtual invisible whiteboard driven by real-time webcam hand tracking"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "mediapipe>=0.10.9",
+    "opencv-python>=4.8",
+    "numpy>=1.24",
+]
+
+[project.scripts]
+drawone = "drawone.__main__:main"
+
+[tool.setuptools]
+packages = [
+    "drawone",
+    "drawone.lib",
+    "drawone.board",
+    "drawone.render",
+    "drawone.tracking",
+    "drawone.ui",
+]
+
+[tool.setuptools.package-data]
+drawone = ["models/*.task"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
