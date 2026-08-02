@@ -23,14 +23,14 @@ MODEL_FILENAME = "hand_landmarker.task"
 def default_model_path() -> Optional[Path]:
     """Finds the vendored model without needing an install step.
 
-    Looks beside the package, then in the repo's `public/models` (where the web
-    build keeps it), then in the current directory.
+    It ships inside the package, so this resolves whether Drawone is installed
+    or run straight from a checkout. The working directory is tried last, for
+    anyone keeping the file next to their own script.
     """
     here = Path(__file__).resolve()
     candidates = [
         here.parent.parent / "models" / MODEL_FILENAME,
-        here.parent.parent.parent / "public" / "models" / MODEL_FILENAME,
-        Path.cwd() / "public" / "models" / MODEL_FILENAME,
+        Path.cwd() / "drawone" / "models" / MODEL_FILENAME,
         Path.cwd() / MODEL_FILENAME,
     ]
     env = os.environ.get("DRAWONE_MODEL")
@@ -76,7 +76,7 @@ class HandTracker:
         if path is None or not path.is_file():
             raise FileNotFoundError(
                 "hand_landmarker.task was not found. Pass --model /path/to/"
-                "hand_landmarker.task, or keep it in public/models/."
+                "hand_landmarker.task, or put it in drawone/models/."
             )
 
         def build(delegate) -> object:

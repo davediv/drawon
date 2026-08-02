@@ -17,7 +17,7 @@ The first run needs camera permission. On macOS that is granted to whatever is
 launching the app — System Settings › Privacy & Security › Camera — and the
 prompt only appears once.
 
-The hand model is `public/models/hand_landmarker.task`, already in the repo, so
+The hand model ships in the package at `drawone/models/hand_landmarker.task`, so
 nothing is downloaded and the app works offline. Point elsewhere with `--model`.
 
 | Command | What it does |
@@ -158,8 +158,8 @@ drawone/
   render/              premultiplied layers, colour, skeleton and cursor overlay
   tracking/            camera, MediaPipe wrapper, gesture maths, pointer identity
   ui/                  dock, readout, key handling, persisted preferences
+  models/              hand model, vendored for offline use
 tests/test_logic.py    gesture, trigger, filter, mapping, history, identity
-public/models/         hand model, vendored for offline use
 ```
 
 ## Requirements
